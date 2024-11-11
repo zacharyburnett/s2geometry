@@ -22,7 +22,7 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: zacharyburnett/setup-abseil-cpp@41fabae9b8c6a76c1b9612c8611c50b498bbeda1 # 1.0.3
+      - uses: zacharyburnett/setup-abseil-cpp@de39f445295c887839e30c864ffbbb1c0231bc83 # 1.0.5
         with:
           cmake-build-args: "-DCMAKE_CXX_STANDARD=17 -DABSL_PROPAGATE_CXX_STD=ON -DABSL_ENABLE_INSTALL=ON -DBUILD_TESTING=off -DCMAKE_POSITION_INDEPENDENT_CODE=ON"
           abseil-version: "20240722.0"
@@ -30,7 +30,7 @@ jobs:
       - run: mkdir build
       - run: cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_PREFIX_PATH=/usr/local/ -DBUILD_TESTS=OFF ..
         working-directory: build/
-      - run: sudo cmake --build . --parallel=8 --target=install
+      - run: sudo cmake --build . --parallel --target=install
         working-directory: build/
   python-wheels:
     strategy:
@@ -48,7 +48,7 @@ jobs:
       fail-fast: false
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: zacharyburnett/setup-abseil-cpp@41fabae9b8c6a76c1b9612c8611c50b498bbeda1 # 1.0.3
+      - uses: zacharyburnett/setup-abseil-cpp@de39f445295c887839e30c864ffbbb1c0231bc83 # 1.0.5
         with:
           cmake-build-args: "-DCMAKE_CXX_STANDARD=17 -DABSL_PROPAGATE_CXX_STD=ON -DABSL_ENABLE_INSTALL=ON -DBUILD_TESTING=off -DCMAKE_POSITION_INDEPENDENT_CODE=ON"
           abseil-version: "20240722.0"
