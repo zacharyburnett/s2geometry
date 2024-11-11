@@ -8,7 +8,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  python:
+  ctest:
+    strategy:
+      matrix:
+        runs-on:
+          - ubuntu-latest
+          - macos-13
+          - macos-latest
+      fail-fast: false
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: zacharyburnett/setup-abseil-cpp@de39f445295c887839e30c864ffbbb1c0231bc83 # 1.0.5
+        with:
+          cmake-build-args: "-DCMAKE_CXX_STANDARD=17 -DABSL_PROPAGATE_CXX_STD=ON -DABSL_ENABLE_INSTALL=ON -DBUILD_TESTING=off -DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+          abseil-version: "20240722.0"
+      - name: retrieve googletest v1.10.0
+        run: |
+          wget https://github.com/google/googletest/archive/refs/tags/release-1.10.0.tar.gz
+          tar -xzvf release-1.10.0.tar.gz
+        working-directory: ${{ runner.temp }}
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: mkdir build
+      - run: cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_PREFIX_PATH=/usr/local/ -DGOOGLETEST_ROOT=${{ runner.temp }}/googletest-release-1.10.0 ..
+        working-directory: build/
+      - run: cmake --build . --parallel
+        working-directory: build/
+      - if: always()
+        run: cmake --build . --parallel --target=test
+        working-directory: build/
+  pytest:
     strategy:
       matrix:
         runs-on:
