@@ -10,6 +10,9 @@ on:
       - released
   workflow_dispatch:
 
+env:
+  GOOGLETEST_VERSION: "1.15.2"
+  
 jobs:
   cmake:
     strategy:
@@ -54,12 +57,20 @@ jobs:
         with:
           cmake-build-args: "-DCMAKE_CXX_STANDARD=17 -DABSL_PROPAGATE_CXX_STD=ON -DABSL_ENABLE_INSTALL=ON -DBUILD_TESTING=off -DCMAKE_POSITION_INDEPENDENT_CODE=ON"
           abseil-version: "20240722.0"
+      - name: retrieve googletest v${{ env.GOOGLETEST_VERSION }}
+        run: |
+          wget https://github.com/google/googletest/releases/download/v${{ env.GOOGLETEST_VERSION }}/googletest-${{ env.GOOGLETEST_VERSION }}.tar.gz
+          tar -xzvf googletest-${{ env.GOOGLETEST_VERSION }}.tar.gz
+          echo GOOGLETEST_ROOT=${{ runner.temp }}/googletest-${{ env.GOOGLETEST_VERSION }} >> $GITHUB_ENV
+        working-directory: ${{ runner.temp }}
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
         with:
           python-version: ${{ matrix.python-version }}
       - run: pip install build
       - run: python -m build
+        env:
+          SETUPTOOLS_CMAKE_OPTIONS: "-DGOOGLETEST_ROOT=${{ runner.temp }}/googletest-${{ env.GOOGLETEST_VERSION }} -DGOOGLETEST_VERSION=${{ env.GOOGLETEST_VERSION }}"
       - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
         with:
           name: s2geometry-py${{ matrix.python-version }}-${{ runner.os }}-${{ runner.arch }}
