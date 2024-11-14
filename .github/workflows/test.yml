@@ -20,6 +20,8 @@ jobs:
           - macos-latest
       fail-fast: false
     runs-on: ${{ matrix.runs-on }}
+    env:
+      CTEST_OUTPUT_ON_FAILURE: ON
     steps:
       - uses: zacharyburnett/setup-abseil-cpp@de39f445295c887839e30c864ffbbb1c0231bc83 # 1.0.5
         with:
