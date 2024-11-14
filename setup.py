@@ -6,7 +6,7 @@ import cmake_build_extension
 import setuptools
 
 
-SETUPTOOLS_CMAKE_OPTIONS = os.environ.get("SETUPTOOLS_CMAKE_OPTIONS", "")
+SETUPTOOLS_CMAKE_OPTIONS = os.environ.get("SETUPTOOLS_CMAKE_OPTIONS", "-DBUILD_TESTS=OFF").split()
 
 setuptools.setup(
     ext_modules=[
@@ -26,7 +26,7 @@ setuptools.setup(
                 "-DBUILD_SHARED_LIBS:BOOL=OFF",
                 "-DCMAKE_POSITION_INDEPENDENT_CODE=ON",
                 "-DWITH_PYTHON=ON",
-                *SETUPTOOLS_CMAKE_OPTIONS.split(),
+                *SETUPTOOLS_CMAKE_OPTIONS,
             ],
         )
     ],
