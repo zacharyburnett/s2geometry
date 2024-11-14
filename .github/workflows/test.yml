@@ -37,7 +37,7 @@ jobs:
       - run: mkdir build
       - run: cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_PREFIX_PATH=/usr/local/ -DGOOGLETEST_ROOT=${{ env.GOOGLETEST_ROOT }} -DGOOGLETEST_VERSION=${{ env.GOOGLETEST_VERSION }} ..
         working-directory: build/
-      - run: cmake --build . --parallel
+      - run: cmake --build . ${{ runner.os == 'macOS' && '--parallel' || '' }}
         working-directory: build/
       - if: always()
         run: cmake --build . --parallel --target=test
