@@ -1,0 +1,88 @@
+name: build
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+  release:
+    types:
+      - released
+  workflow_dispatch:
+
+jobs:
+  cmake:
+    strategy:
+      matrix:
+        runs-on:
+          - ubuntu-latest
+          # macos-13 is an intel runner, macos-14 is apple silicon
+          - macos-13
+          - macos-latest
+      fail-fast: false
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: zacharyburnett/setup-abseil-cpp@de39f445295c887839e30c864ffbbb1c0231bc83 # 1.0.5
+        with:
+          cmake-build-args: "-DCMAKE_CXX_STANDARD=17 -DABSL_PROPAGATE_CXX_STD=ON -DABSL_ENABLE_INSTALL=ON -DBUILD_TESTING=off -DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+          abseil-version: "20240722.0"
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - run: mkdir build
+      - run: cmake -DCMAKE_CXX_STANDARD=17 -DCMAKE_PREFIX_PATH=/usr/local/ -DBUILD_TESTS=OFF ..
+        working-directory: build/
+      - run: sudo cmake --build . --parallel --target=install
+        working-directory: build/
+  python-wheels:
+    strategy:
+      matrix:
+        runs-on:
+          - ubuntu-latest
+          # macos-13 is an intel runner, macos-14 is apple silicon
+          - macos-13
+          - macos-latest
+        python-version:
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+          - "3.13"
+        exclude:
+          # importing the package from the wheel instantly segfaults on macOS Python <= 3.12
+          - runs-on: macos-latest
+            python-version: "3.8"
+          - runs-on: macos-latest
+            python-version: "3.9"
+          - runs-on: macos-latest
+            python-version: "3.10"
+          - runs-on: macos-latest
+            python-version: "3.11"
+          - runs-on: macos-latest
+            python-version: "3.12"
+          - runs-on: macos-13
+            python-version: "3.8"
+          - runs-on: macos-13
+            python-version: "3.9"
+          - runs-on: macos-13
+            python-version: "3.10"
+          - runs-on: macos-13
+            python-version: "3.11"
+          - runs-on: macos-13
+            python-version: "3.12"
+      fail-fast: false
+    runs-on: ${{ matrix.runs-on }}
+    steps:
+      - uses: zacharyburnett/setup-abseil-cpp@de39f445295c887839e30c864ffbbb1c0231bc83 # 1.0.5
+        with:
+          cmake-build-args: "-DCMAKE_CXX_STANDARD=17 -DABSL_PROPAGATE_CXX_STD=ON -DABSL_ENABLE_INSTALL=ON -DBUILD_TESTING=off -DCMAKE_POSITION_INDEPENDENT_CODE=ON"
+          abseil-version: "20240722.0"
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/setup-python@0b93645e9fea7318ecaed2b359559ac225c90a2b # v5.3.0
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install build
+      - run: python -m build
+      - uses: actions/upload-artifact@b4b15b8c7c6ac21ea08fcf65892d2ee8f75cf882 # v4.4.3
+        with:
+          name: s2geometry-py${{ matrix.python-version }}-${{ runner.os }}-${{ runner.arch }}
+          path: ./dist/*.whl

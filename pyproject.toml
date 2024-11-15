@@ -40,6 +40,7 @@ requires = [
     "setuptools",
     "setuptools_scm[toml]",
     "cmake_build_extension",
+    "swig",
 ]
 build-backend = "setuptools.build_meta"
 
