@@ -1,3 +1,7 @@
-dist/
-*.egg-info
 build/
+
+# Python wheels
+dist/
+
+# Python package metadata
+*.egg-info
