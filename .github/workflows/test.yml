@@ -54,18 +54,33 @@ jobs:
           - macos-latest
         python-version:
           - "3.8"
+          - "3.9"
           - "3.10"
+          - "3.11"
+          - "3.12"
           - "3.13"
         exclude:
           # importing the package from the wheel instantly segfaults on macOS Python <= 3.12
           - runs-on: macos-latest
             python-version: "3.8"
           - runs-on: macos-latest
+            python-version: "3.9"
+          - runs-on: macos-latest
             python-version: "3.10"
+          - runs-on: macos-latest
+            python-version: "3.11"
+          - runs-on: macos-latest
+            python-version: "3.12"
           - runs-on: macos-13
             python-version: "3.8"
           - runs-on: macos-13
+            python-version: "3.9"
+          - runs-on: macos-13
             python-version: "3.10"
+          - runs-on: macos-13
+            python-version: "3.11"
+          - runs-on: macos-13
+            python-version: "3.12"
       fail-fast: false
     runs-on: ${{ matrix.runs-on }}
     steps:
